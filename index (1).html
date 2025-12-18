@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Launcher</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{
+  margin:0;
+  height:100vh;
+  display:grid;
+  place-items:center;
+  background:#0f172a;
+  font-family:system-ui,Arial,sans-serif;
+}
+button{
+  padding:16px 32px;
+  font-size:1.2rem;
+  border-radius:14px;
+  border:none;
+  cursor:pointer;
+  background:#22c55e;
+  color:#000;
+}
+button:hover{background:#16a34a}
+</style>
+</head>
+<body>
+
+<button onclick="openMiniBrowser()">OPEN</button>
+
+<script>
+function openMiniBrowser(){
+  const win = window.open("about:blank","_blank");
+  if(!win) return;
+
+  win.document.write(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Khan Academy</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link id="favicon" rel="icon" href="https://www.khanacademy.org/favicon.ico">
+<style>
+:root{
+  --bg:#0f0f0f;
+  --panel:#111;
+  --panel2:#222;
+  --border:#333;
+  --text:#eee;
+}
+*{box-sizing:border-box}
+body{margin:0;height:100vh;display:flex;font-family:system-ui,Arial,sans-serif;background:var(--bg);color:var(--text);}
+#sidebar{width:220px;background:var(--panel);border-right:1px solid var(--border);padding:10px;}
+#sidebar h3{font-size:14px;color:#aaa;margin:8px 0;}
+#sidebar input,#sidebar select,#sidebar button{width:100%;margin-bottom:6px;padding:6px;background:var(--panel2);border:1px solid #444;color:#fff;border-radius:4px;}
+#main{flex:1;display:flex;flex-direction:column;}
+#tabs{display:flex;gap:6px;padding:6px;background:var(--panel);border-bottom:1px solid var(--border);}
+.tab{padding:6px 12px;background:var(--panel2);border-radius:6px;cursor:pointer;}
+.tab.active{background:#444;}
+#controls{display:flex;gap:6px;padding:6px;background:var(--panel);border-bottom:1px solid var(--border);}
+#url{flex:1;padding:8px;background:var(--panel2);border:1px solid #444;color:#fff;}
+#browser{flex:1;position:relative;}
+iframe{position:absolute;inset:0;width:100%;height:100%;border:none;display:none;}
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+<h3>Tab Cloak</h3>
+<input id="fakeTitle" placeholder="Fake tab title">
+<select id="fakeIcon">
+<option value="khan">Khan Academy</option>
+<option value="docs">Google Docs</option>
+<option value="drive">Google Drive</option>
+<option value="classroom">Google Classroom</option>
+</select>
+<button onclick="applyCloak()">Apply</button>
+
+<h3>Controls</h3>
+<button onclick="toggleFullscreen()">Fullscreen</button>
+<button onclick="panic()">Panic</button>
+</div>
+
+<div id="main">
+<div id="tabs"></div>
+
+<div id="controls">
+<button onclick="newTab()">+</button>
+<input id="url" placeholder="Enter URL">
+<button onclick="go()">Go</button>
+</div>
+
+<div id="browser"></div>
+</div>
+
+<script>
+let tabs=[],current=null;
+const HOME="https://www.khanacademy.org";
+
+function newTab(url=HOME){
+  const id=crypto.randomUUID();
+  const iframe=document.createElement("iframe");
+  iframe.src=url;
+  const tab={id,iframe,url};
+  tabs.push(tab);
+  const btn=document.createElement("div");
+  btn.className="tab";
+  btn.textContent="Tab";
+  btn.onclick=()=>switchTab(id);
+  document.getElementById("tabs").appendChild(btn);
+  document.getElementById("browser").appendChild(iframe);
+  switchTab(id);
+}
+
+function switchTab(id){
+  current=tabs.find(t=>t.id===id);
+  tabs.forEach(t=>t.iframe.style.display="none");
+  current.iframe.style.display="block";
+  url.value=current.url;
+}
+
+function go(){
+  if(!current)return;
+  let v=url.value.trim();
+  current.url=v.startsWith("http")?v:"https://"+v;
+  current.iframe.src=current.url;
+}
+
+function applyCloak(){
+  document.title=fakeTitle.value||"Khan Academy";
+  const icons={
+    khan:"https://www.khanacademy.org/favicon.ico",
+    docs:"https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png",
+    drive:"https://ssl.gstatic.com/images/branding/product/2x/drive_2020q4_48dp.png",
+    classroom:"https://ssl.gstatic.com/classroom/ic_product_classroom_48.png"
+  };
+  favicon.href=icons[fakeIcon.value];
+}
+
+function toggleFullscreen(){
+  document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
+}
+
+function panic(){
+  location.replace("https://www.khanacademy.org");
+}
+
+newTab();
+</script>
+
+</body>
+</html>
+  `);
+
+  win.document.close();
+}
+</script>
+
+</body>
+</html>
